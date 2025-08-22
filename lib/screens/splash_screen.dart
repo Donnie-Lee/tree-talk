@@ -17,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     // 3秒后自动跳转到主页
     Future.delayed(const Duration(seconds: 3), () {
-      AppRoutes.navigateToReplace(context, AppRoutes.main);
+      AppRoutes.navigateToReplace(context, AppRoutes.login);
     });
   }
 

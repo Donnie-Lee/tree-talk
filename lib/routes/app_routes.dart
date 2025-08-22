@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/splash_screen.dart';
+import '../screens/login_screen.dart';
 import '../screens/main_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/chat_screen.dart';
@@ -10,6 +11,7 @@ import '../screens/profile_screen.dart';
 class AppRoutes {
   // 路由名称常量
   static const String splash = '/';
+  static const String login = '/login';
   static const String main = '/main';
   static const String home = '/home';
   static const String chat = '/chat';
@@ -20,6 +22,7 @@ class AppRoutes {
   // 路由表
   static Map<String, WidgetBuilder> routes = {
     splash: (context) => const SplashScreen(),
+    login: (context) => const LoginScreen(),
     main: (context) => const MainScreen(),
     home: (context) => const HomeScreen(),
     chat: (context) => const ChatScreen(),

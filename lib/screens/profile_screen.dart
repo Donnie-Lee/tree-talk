@@ -1,8 +1,69 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../routes/app_routes.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppColors.glassBg,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: AppColors.glassBorder),
+          ),
+          title: Text(
+            '确认退出',
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            '确定要退出登录吗？退出后需要重新登录才能使用应用。',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 16,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // 取消关闭弹窗
+              },
+              child: Text(
+                '取消',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // 关闭确认弹窗
+                // 跳转到登录页
+                Navigator.pushReplacementNamed(context, AppRoutes.login);
+              },
+              child: Text(
+                '确定',
+                style: TextStyle(
+                  color: AppColors.accent,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +106,7 @@ class ProfileScreen extends StatelessWidget {
               _buildSettingItem(
                 icon: Icons.logout,
                 title: '退出登录',
-                onTap: () {},
+                onTap: () => _showLogoutDialog(context),
                 showDivider: false,
               ),
             ],
