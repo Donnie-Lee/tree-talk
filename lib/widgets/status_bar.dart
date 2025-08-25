@@ -9,7 +9,7 @@ class StatusBar extends StatelessWidget {
     return Container(
       height: 88,
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      color: Colors.black.withOpacity(0.3),
+      color: Colors.black.withValues(alpha: 0.3),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

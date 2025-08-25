@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'theme/app_colors.dart';
-import 'theme/app_theme.dart';
 import 'routes/app_routes.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
@@ -24,8 +23,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
       initialRoute: AppRoutes.splash,
-      routes: AppRoutes.routes,
-      onGenerateRoute: AppRoutes.onGenerateRoute,
+      onGenerateRoute: AppRoutes.generateRoute,
     );
   }
 }

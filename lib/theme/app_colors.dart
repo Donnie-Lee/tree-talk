@@ -31,4 +31,7 @@ class AppColors {
   // 玻璃态效果
   static const Color glassBg = Color(0xB33D2B2B);
   static const Color glassBorder = Color(0x1AFFFFFF);
+
+  // 背景色
+ static const Color background = Colors.transparent;
 }

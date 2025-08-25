@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import '../widgets/status_bar.dart';
 import '../widgets/bottom_nav_bar.dart';
-import '../screens/home_screen.dart';
-import '../screens/chat_screen.dart';
-import '../screens/meditation_screen.dart';
-import '../screens/tree_hole_screen.dart';
-import '../screens/profile_screen.dart';
+import 'home_screen.dart';
+import 'tree_hole_screen.dart';
+import 'chat_screen.dart';
+import 'meditation_screen.dart';
+import 'profile_screen.dart';
 import '../widgets/grid_painter.dart';
 
 class MainScreen extends StatefulWidget {

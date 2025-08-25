@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../theme/app_colors.dart';
 import '../routes/app_routes.dart';
 
@@ -119,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           width: 80,
                           height: 80,
                           decoration: BoxDecoration(
-                            color: AppColors.accent.withOpacity(0.2),
+                            color: AppColors.accent.withValues(alpha: 0.2),
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
@@ -314,7 +313,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               child: TextButton(
                 onPressed: _countdown > 0 ? null : _sendCode,
                 style: TextButton.styleFrom(
-                  backgroundColor: AppColors.accent.withOpacity(0.2),
+                  backgroundColor: AppColors.accent.withValues(alpha: 0.2),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -403,7 +402,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         style: const TextStyle(color: AppColors.textPrimary),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.7)),
+          hintStyle: TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.7)),
           prefixIcon: Icon(prefixIcon, color: AppColors.textSecondary),
           suffixIcon: suffixIcon,
           border: InputBorder.none,

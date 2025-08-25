@@ -1,60 +1,78 @@
 import 'package:flutter/material.dart';
+import '../services/mood_service.dart';
+import '../widgets/mood_calendar.dart';
+import '../widgets/mood_chart.dart';
 import '../theme/app_colors.dart';
+import '../utils/page_transitions.dart';
+import 'mood_edit_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final MoodService _moodService = MoodService();
+  DateTime? _selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDate = DateTime.now();
+  }
+
+  void _navigateToMoodEdit(DateTime date) async {
+    final result = await Navigator.push(
+      context,
+      PageTransitions.slideUp(
+        MoodEditScreen(
+          date: date,
+          moodService: _moodService,
+        ),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedDate = date;
+      });
+    }
+  }
+
+  void _onDateSelected(DateTime date) {
+    setState(() {
+      _selectedDate = date;
+    });
+    _navigateToMoodEdit(date);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final today = DateTime.now();
+    final hasTodayRecord = _moodService.hasRecordForDate(today);
+
     return SafeArea(
       child: SingleChildScrollView(
-        // padding: const EdgeInsets.only(top: 44, bottom: 84),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              Text(
-                '今天感觉如何？',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
+              
+              // 日历组件
+              MoodCalendar(
+                moodService: _moodService,
+                onDateSelected: _onDateSelected,
               ),
-              const SizedBox(height: 8),
-              Text(
-                '选择一个最能代表你当前情绪的状态',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: AppColors.textSecondary,
-                ),
-              ),
+              
               const SizedBox(height: 24),
               
-              // 情绪网格
-              GridView.count(
-                crossAxisCount: 3,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                children: [
-                  _buildEmotionItem('开心', Icons.sentiment_very_satisfied, AppColors.emotionHappy),
-                  _buildEmotionItem('平静', Icons.sentiment_satisfied, AppColors.emotionCalm),
-                  _buildEmotionItem('焦虑', Icons.sentiment_neutral, AppColors.emotionAnxious),
-                  _buildEmotionItem('悲伤', Icons.sentiment_dissatisfied, AppColors.emotionSad),
-                  _buildEmotionItem('愤怒', Icons.sentiment_very_dissatisfied, AppColors.emotionAngry),
-                  _buildEmotionItem('疲惫', Icons.bedtime, AppColors.emotionTired),
-                ],
-              ),
-              
-              const SizedBox(height: 32),
-              
-              // 情绪日记
+              // 情绪图表
               Text(
-                '记录你的心情',
+                '${today.month}月心情走势',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -63,179 +81,33 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               
-              // 输入区域
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.glassBg,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.glassBorder),
-                ),
-                child: Column(
-                  children: [
-                    TextField(
-                      maxLines: 5,
-                      decoration: InputDecoration(
-                        hintText: '写下你的感受...',
-                        hintStyle: TextStyle(color: AppColors.textTertiary),
-                        border: InputBorder.none,
+              MoodChart(
+                moodService: _moodService,
+                selectedDate: _selectedDate,
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // 快速记录按钮 - 仅在今日未记录时显示
+              if (!hasTodayRecord)
+                Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _navigateToMoodEdit(today),
+                    icon: const Icon(Icons.add, size: 20),
+                    label: const Text('记录今日心情'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accent,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      style: TextStyle(color: AppColors.textPrimary),
                     ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.tag, color: AppColors.textSecondary, size: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              '添加标签',
-                              style: TextStyle(color: AppColors.textSecondary),
-                            ),
-                          ],
-                        ),
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.accent,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text('保存'),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-              
-              const SizedBox(height: 32),
-              
-              // 情绪趋势
-              Text(
-                '情绪趋势',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              
-              // 趋势图
-              Container(
-                height: 200,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.glassBg,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.glassBorder),
-                ),
-                child: CustomPaint(
-                  size: const Size(double.infinity, 200),
-                  painter: EmotionChartPainter(),
-                ),
-              ),
             ],
           ),
         ),
       ),
     );
   }
-  
-  Widget _buildEmotionItem(String label, IconData icon, Color color) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.glassBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.glassBorder),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color.withOpacity(0.2),
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 30,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// 情绪趋势图绘制
-class EmotionChartPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.accent
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
-    
-    final dotPaint = Paint()
-      ..color = AppColors.accent
-      ..style = PaintingStyle.fill;
-    
-    final path = Path();
-    
-    // 模拟数据点
-    final points = [
-      Offset(0, size.height * 0.5),
-      Offset(size.width * 0.2, size.height * 0.7),
-      Offset(size.width * 0.4, size.height * 0.3),
-      Offset(size.width * 0.6, size.height * 0.5),
-      Offset(size.width * 0.8, size.height * 0.2),
-      Offset(size.width, size.height * 0.4),
-    ];
-    
-    // 绘制路径
-    path.moveTo(points[0].dx, points[0].dy);
-    for (int i = 1; i < points.length; i++) {
-      path.lineTo(points[i].dx, points[i].dy);
-    }
-    
-    canvas.drawPath(path, paint);
-    
-    // 绘制数据点
-    for (var point in points) {
-      canvas.drawCircle(point, 4, dotPaint);
-    }
-    
-    // 绘制X轴标签
-    final textStyle = TextStyle(color: AppColors.textSecondary, fontSize: 10);
-    final textSpan = TextSpan(
-      text: '过去7天',
-      style: textStyle,
-    );
-    final textPainter = TextPainter(
-      text: textSpan,
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    textPainter.paint(canvas, Offset(size.width - textPainter.width, size.height - textPainter.height));
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

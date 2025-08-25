@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
 import '../routes/app_routes.dart';
+import '../theme/app_colors.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: AppColors.glassBg,
+          backgroundColor: AppColors.primaryDark,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
             side: BorderSide(color: AppColors.glassBorder),
@@ -67,11 +72,11 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        // padding: const EdgeInsets.only(top: 44, bottom: 84),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: [
               // 用户头像和基本信息
@@ -82,32 +87,50 @@ class ProfileScreen extends StatelessWidget {
               _buildStatsCard(),
               const SizedBox(height: 16),
 
-              // 设置选项
-              _buildSettingItem(
-                icon: Icons.notifications_outlined,
-                title: '通知设置',
-                onTap: () {},
-              ),
-              _buildSettingItem(
-                icon: Icons.lock_outline,
-                title: '隐私设置',
-                onTap: () {},
-              ),
-              _buildSettingItem(
-                icon: Icons.help_outline,
-                title: '帮助中心',
-                onTap: () {},
-              ),
-              _buildSettingItem(
-                icon: Icons.info_outline,
-                title: '关于我们',
-                onTap: () {},
-              ),
-              _buildSettingItem(
-                icon: Icons.logout,
-                title: '退出登录',
-                onTap: () => _showLogoutDialog(context),
-                showDivider: false,
+              // 设置列表
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.glassBg.withValues(alpha: 0.4),
+                      AppColors.glassBg.withValues(alpha: 0.2),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.glassBorder),
+                ),
+                child: Column(
+                  children: [
+                    _buildSettingItem(
+                      icon: Icons.notifications_outlined,
+                      title: '通知设置',
+                      onTap: () {},
+                    ),
+                    _buildSettingItem(
+                      icon: Icons.lock_outline,
+                      title: '隐私设置',
+                      onTap: () {},
+                    ),
+                    _buildSettingItem(
+                      icon: Icons.palette_outlined,
+                      title: '主题设置',
+                      onTap: () {},
+                    ),
+                    _buildSettingItem(
+                      icon: Icons.help_outline,
+                      title: '帮助与反馈',
+                      onTap: () {},
+                    ),
+                    _buildSettingItem(
+                      icon: Icons.logout,
+                      title: '退出登录',
+                      onTap: () => _showLogoutDialog(context),
+                      isDestructive: true,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -288,34 +311,37 @@ class ProfileScreen extends StatelessWidget {
     required IconData icon,
     required String title,
     required VoidCallback onTap,
-    bool showDivider = true,
+    bool isDestructive = false,
   }) {
-    return Column(
-      children: [
-        InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Row(
-              children: [
-                Icon(icon, color: AppColors.textSecondary, size: 24),
-                const SizedBox(width: 16),
-                Text(
-                  title,
-                  style: TextStyle(fontSize: 16, color: AppColors.textPrimary),
-                ),
-                const Spacer(),
-                Icon(
-                  Icons.chevron_right,
-                  color: AppColors.textTertiary,
-                  size: 20,
-                ),
-              ],
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: isDestructive ? Colors.red : AppColors.textPrimary,
+              size: 24,
             ),
-          ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDestructive ? Colors.red : AppColors.textPrimary,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              color: AppColors.textSecondary,
+            ),
+          ],
         ),
-        if (showDivider) Divider(color: AppColors.glassBorder, height: 1),
-      ],
+      ),
     );
   }
 }

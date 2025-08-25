@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
-import '../widgets/grid_painter.dart';
 import '../routes/app_routes.dart';
-import 'main_screen.dart';
+import '../theme/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,109 +9,122 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen> 
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
+
   @override
   void initState() {
     super.initState();
-    // 3秒后自动跳转到主页
-    Future.delayed(const Duration(seconds: 3), () {
-      AppRoutes.navigateToReplace(context, AppRoutes.login);
+    
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      ),
+    );
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      ),
+    );
+
+    _controller.forward();
+
+    // 启动页动画完成后平滑过渡到登录页
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        AppRoutes.navigateToReplace(context, AppRoutes.login);
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.primaryDark,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [AppColors.primaryDark, AppColors.primary],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.primaryDark,
+              AppColors.primary,
+              AppColors.primaryLight,
+            ],
           ),
         ),
-        child: Stack(
-          children: [
-            // 网格背景
-            Positioned.fill(
-              child: CustomPaint(
-                painter: GridPainter(),
-              ),
-            ),
-            // 中心光晕
-            Center(
-              child: Container(
-                width: 300,
-                height: 300,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [AppColors.accentGlow, Colors.transparent],
-                    stops: const [0.0, 0.7],
-                  ),
-                ),
-              ),
-            ),
-            // 应用信息
-            Center(
+        child: Center(
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: ScaleTransition(
+              scale: _scaleAnimation,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo
                   Container(
-                    width: 120,
-                    height: 120,
+                    width: 100,
+                    height: 100,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.primary,
+                      color: AppColors.accent.withValues(alpha: 0.2),
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.accentGlow,
-                          blurRadius: 15,
-                          spreadRadius: 5,
+                          blurRadius: 30,
+                          spreadRadius: 10,
                         ),
                       ],
-                      border: Border.all(
-                        color: AppColors.accent,
-                        width: 2,
-                      ),
                     ),
-                    child: Center(
-                      child: Icon(
-                        Icons.spa_outlined,
-                        size: 60,
-                        color: AppColors.accent,
-                      ),
+                    child: Icon(
+                      Icons.forest,
+                      size: 50,
+                      color: AppColors.accent,
                     ),
                   ),
                   const SizedBox(height: 24),
-                  // 应用名称
-                  ShaderMask(
-                    shaderCallback: (bounds) => LinearGradient(
-                      colors: [AppColors.neonOrange, AppColors.accent],
-                    ).createShader(bounds),
-                    child: const Text(
-                      '心语 TreeTalk',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                  Text(
+                    '心语 TreeTalk',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  // 应用标语
+                  const SizedBox(height: 8),
                   Text(
-                    '倾听内心，疗愈心灵',
+                    '记录心情，疗愈心灵',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       color: AppColors.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

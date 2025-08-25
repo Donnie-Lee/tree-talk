@@ -91,13 +91,13 @@ class ChatScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.accent.withOpacity(0.2),
+                color: AppColors.accent.withValues(alpha: 0.2),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(16),
                   bottomLeft: Radius.circular(16),
                   bottomRight: Radius.circular(16),
                 ),
-                border: Border.all(color: AppColors.accent.withOpacity(0.3)),
+                border: Border.all(color: AppColors.accent.withValues(alpha: 0.3)),
               ),
               child: Text(
                 message,

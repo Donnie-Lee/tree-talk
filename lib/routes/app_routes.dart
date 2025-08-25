@@ -7,6 +7,7 @@ import '../screens/chat_screen.dart';
 import '../screens/meditation_screen.dart';
 import '../screens/tree_hole_screen.dart';
 import '../screens/profile_screen.dart';
+import '../utils/page_transitions.dart';
 
 class AppRoutes {
   // 路由名称常量
@@ -31,29 +32,28 @@ class AppRoutes {
     profile: (context) => const ProfileScreen(),
   };
 
-  // 路由生成器，用于处理未定义的路由或需要传递参数的路由
-  static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
+  // 生成带过渡动画的路由
+  static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      // 可以在这里添加需要传递参数的路由处理
+      case splash:
+        return PageTransitions.fade(const SplashScreen());
+      case login:
+        return PageTransitions.fade(const LoginScreen());
+      case main:
+        return PageTransitions.slideRight(const MainScreen());
+      case home:
+        return PageTransitions.slideRight(const HomeScreen());
+      case chat:
+        return PageTransitions.slideRight(const ChatScreen());
+      case meditation:
+        return PageTransitions.slideRight(const MeditationScreen());
+      case treeHole:
+        return PageTransitions.slideRight(const TreeHoleScreen());
+      case profile:
+        return PageTransitions.slideRight(const ProfileScreen());
       default:
-        return null;
+        return PageTransitions.fade(const SplashScreen());
     }
-  }
-
-  // 页面切换动画
-  static PageRouteBuilder buildPageRoute(Widget page) {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0);
-        const end = Offset.zero;
-        const curve = Curves.easeInOut;
-        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-        var offsetAnimation = animation.drive(tween);
-        return SlideTransition(position: offsetAnimation, child: child);
-      },
-      transitionDuration: const Duration(milliseconds: 300),
-    );
   }
 
   // 导航到指定页面的方法
