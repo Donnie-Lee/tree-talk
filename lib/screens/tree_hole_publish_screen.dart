@@ -41,7 +41,7 @@ class _TreeHolePublishScreenState extends State<TreeHolePublishScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.primaryDark,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,

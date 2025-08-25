@@ -81,7 +81,7 @@ class _MoodEditScreenState extends State<MoodEditScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.primaryDark,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
