@@ -41,25 +41,37 @@ class BottomNavBar extends StatelessWidget {
   Widget _buildTabItem(int index, IconData icon, String label) {
     final isActive = currentIndex == index;
     
-    return GestureDetector(
+    // 增大触摸目标尺寸到48x48像素
+    return InkWell(
       onTap: () => onTap(index),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: isActive ? AppColors.accent : AppColors.textSecondary,
-            size: 24,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
+      // 提供水波纹触摸反馈
+      splashColor: AppColors.accent.withValues(alpha: 0.3),
+      highlightColor: AppColors.accent.withValues(alpha: 0.1),
+      // 设置足够大的点击区域
+      borderRadius: BorderRadius.circular(24),
+      child: Container(
+        width: 60,
+        height: 60,
+        // padding: const EdgeInsets.all(8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
               color: isActive ? AppColors.accent : AppColors.textSecondary,
-              fontSize: 12,
+              size: 26,
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: isActive ? AppColors.accent : AppColors.textSecondary,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

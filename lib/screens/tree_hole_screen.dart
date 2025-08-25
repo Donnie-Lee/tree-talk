@@ -48,12 +48,12 @@ class _TreeHoleScreenState extends State<TreeHoleScreen> {
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.add_circle_outline),
-                    color: AppColors.accent,
-                    iconSize: 28,
-                    onPressed: _navigateToPublish,
-                  ),
+                  // IconButton(
+                  //   icon: const Icon(Icons.add_circle_outline),
+                  //   color: AppColors.accent,
+                  //   iconSize: 28,
+                  //   onPressed: _navigateToPublish,
+                  // ),
                 ],
               ),
               const SizedBox(height: 16),
