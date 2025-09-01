@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tree_talk/models/api_response.dart';
+import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../routes/app_routes.dart';
 
@@ -9,7 +11,8 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -17,11 +20,14 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   bool _obscurePassword = true;
   bool _isLoading = false;
   int _countdown = 0;
+  var apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _phoneController.text = '18306079883';
+    _passwordController.text = 'lizheng19950826';
   }
 
   @override
@@ -35,37 +41,70 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
   void _sendCode() async {
     if (_phoneController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请输入手机号')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('请输入手机号')));
       return;
     }
+    apiService
+        .checkCode(_phoneController.text, 'LOGIN')
+        .then(
+          (res) => {
+            if (res.success)
+              {
+                if (mounted)
+                  {
+                    setState(() {
+                      _countdown = 60;
+                    }),
+                    // 模拟倒计时
+                    for (int i = 60; i > 0; i--)
+                      {
+                        Future.delayed(const Duration(seconds: 1)),
 
-    setState(() {
-      _countdown = 60;
-    });
-
-    // 模拟倒计时
-    for (int i = 60; i > 0; i--) {
-      await Future.delayed(const Duration(seconds: 1));
-      if (mounted) {
-        setState(() {
-          _countdown = i - 1;
-        });
-      }
-    }
+                        setState(() {
+                          _countdown = i - 1;
+                        }),
+                      },
+                  },
+              }
+            else
+              {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(res.message))),
+              },
+          },
+        );
   }
 
   void _login() async {
     setState(() => _isLoading = true);
 
-    // 模拟登录过程
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (mounted) {
-      setState(() => _isLoading = false);
-      AppRoutes.navigateToAndRemoveUntil(context, AppRoutes.main);
-    }
+    apiService
+        .login(
+          _phoneController.text,
+          _passwordController.text,
+          _tabController.index == 0 ? 'VERIFICATION_CODE' : 'PASSWORD',
+        )
+        .then((response) {
+          if (mounted) {
+            setState(() => _isLoading = false);
+            if (response.success) {
+              AppRoutes.navigateToAndRemoveUntil(context, AppRoutes.main);
+            } else {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(response.message)));
+            }
+          }
+        })
+        .catchError((error) {
+          setState(() => _isLoading = false);
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(error.toString())));
+        });
   }
 
   void _thirdPartyLogin(String platform) async {
@@ -170,10 +209,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         controller: _tabController,
                         indicator: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [
-                              AppColors.accent,
-                              AppColors.neonOrange,
-                            ],
+                            colors: [AppColors.accent, AppColors.neonOrange],
                           ),
                           borderRadius: BorderRadius.circular(25),
                         ),
@@ -181,10 +217,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         labelColor: AppColors.textPrimary,
                         dividerColor: Colors.transparent,
                         unselectedLabelColor: AppColors.textSecondary,
-                        tabs: const [
-                          Tab(text: '手机验证码'),
-                          Tab(text: '密码登录'),
-                        ],
+                        tabs: const [Tab(text: '手机验证码'), Tab(text: '密码登录')],
                       ),
                     ),
 
@@ -192,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
                     // 表单区域
                     SizedBox(
-                      height: 300,
+                      height: 200,
                       child: TabBarView(
                         controller: _tabController,
                         children: [
@@ -204,83 +237,73 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       ),
                     ),
 
-                    const SizedBox(height: 32),
-
-
-
+                    // 登录按钮
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _login,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.accent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                          elevation: 8,
+                          shadowColor: AppColors.accentGlow,
+                        ),
+                        child:
+                            _isLoading
+                                ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                                : const Text(
+                                  '登录',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      '或使用以下方式登录',
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildThirdPartyButton(
+                          Icons.wechat,
+                          Colors.green,
+                          '微信',
+                          () => _thirdPartyLogin('wechat'),
+                        ),
+                        const SizedBox(width: 24),
+                        _buildThirdPartyButton(
+                          Icons.chat,
+                          Colors.blue,
+                          'QQ',
+                          () => _thirdPartyLogin('qq'),
+                        ),
+                        const SizedBox(width: 24),
+                        _buildThirdPartyButton(
+                          Icons.music_note,
+                          Colors.black,
+                          '抖音',
+                          () => _thirdPartyLogin('douyin'),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
             ),
-            // 第三方登录
-            Positioned(
-              left: 32.0,
-              right: 32.0,
-              bottom: 20,
-              child:   Column(
-                children: [
-                  // 登录按钮
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _login,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.accent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(28),
-                        ),
-                        elevation: 8,
-                        shadowColor: AppColors.accentGlow,
-                      ),
-                      child: _isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                        '登录',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    '或使用以下方式登录',
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildThirdPartyButton(
-                        Icons.wechat,
-                        Colors.green,
-                        '微信',
-                            () => _thirdPartyLogin('wechat'),
-                      ),
-                      const SizedBox(width: 24),
-                      _buildThirdPartyButton(
-                        Icons.chat,
-                        Colors.blue,
-                        'QQ',
-                            () => _thirdPartyLogin('qq'),
-                      ),
-                      const SizedBox(width: 24),
-                      _buildThirdPartyButton(
-                        Icons.music_note,
-                        Colors.black,
-                        '抖音',
-                            () => _thirdPartyLogin('douyin'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),)
           ],
         ),
       ),
@@ -321,9 +344,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 child: Text(
                   _countdown > 0 ? '${_countdown}s' : '获取验证码',
                   style: TextStyle(
-                    color: _countdown > 0
-                        ? AppColors.textSecondary
-                        : AppColors.accent,
+                    color:
+                        _countdown > 0
+                            ? AppColors.textSecondary
+                            : AppColors.accent,
                   ),
                 ),
               ),
@@ -390,10 +414,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       decoration: BoxDecoration(
         color: AppColors.glassBg,
         borderRadius: BorderRadius.circular(25),
-        border: Border.all(
-          color: AppColors.glassBorder,
-          width: 1,
-        ),
+        border: Border.all(color: AppColors.glassBorder, width: 1),
       ),
       child: TextField(
         controller: controller,
@@ -402,7 +423,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         style: const TextStyle(color: AppColors.textPrimary),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.7)),
+          hintStyle: TextStyle(
+            color: AppColors.textSecondary.withValues(alpha: 0.7),
+          ),
           prefixIcon: Icon(prefixIcon, color: AppColors.textSecondary),
           suffixIcon: suffixIcon,
           border: InputBorder.none,
@@ -429,10 +452,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           decoration: BoxDecoration(
             color: AppColors.glassBg,
             shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColors.glassBorder,
-              width: 1,
-            ),
+            border: Border.all(color: AppColors.glassBorder, width: 1),
           ),
           child: IconButton(
             icon: Icon(icon, color: color, size: 30),
@@ -442,10 +462,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: 12,
-          ),
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
         ),
       ],
     );

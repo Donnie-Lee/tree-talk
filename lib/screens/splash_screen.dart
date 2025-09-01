@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../routes/app_routes.dart';
 import '../theme/app_colors.dart';
+import '../services/http_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -46,10 +48,19 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // 启动页动画完成后平滑过渡到登录页
-    Future.delayed(const Duration(seconds: 2), () {
+    // 启动页动画完成后检查是否有保存的token
+    Future.delayed(const Duration(seconds: 2), () async {
       if (mounted) {
-        AppRoutes.navigateToReplace(context, AppRoutes.login);
+        // 初始化HttpService并检查token
+        final httpService = await HttpService.initialize();
+        final token = httpService.getSavedToken();
+        
+        // 根据token是否存在决定跳转到首页还是登录页
+        if (token != null) {
+          AppRoutes.navigateToReplace(context, AppRoutes.main);
+        } else {
+          AppRoutes.navigateToReplace(context, AppRoutes.login);
+        }
       }
     });
   }

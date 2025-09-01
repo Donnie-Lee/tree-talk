@@ -54,14 +54,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final hasTodayRecord = _moodService.hasRecordForDate(today);
 
     return SafeArea(
+      bottom: false,
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
-              
+
               // 日历组件
               MoodCalendar(
                 moodService: _moodService,

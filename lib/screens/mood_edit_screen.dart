@@ -24,12 +24,12 @@ class _MoodEditScreenState extends State<MoodEditScreen> {
   IconData? _selectedIcon;
 
   final Map<String, Map<String, dynamic>> _moodOptions = {
-    '开心': {'color': AppColors.emotionHappy, 'icon': Icons.sentiment_very_satisfied},
-    '平静': {'color': AppColors.emotionCalm, 'icon': Icons.sentiment_satisfied},
-    '焦虑': {'color': AppColors.emotionAnxious, 'icon': Icons.sentiment_neutral},
-    '悲伤': {'color': AppColors.emotionSad, 'icon': Icons.sentiment_dissatisfied},
-    '愤怒': {'color': AppColors.emotionAngry, 'icon': Icons.sentiment_very_dissatisfied},
-    '疲惫': {'color': AppColors.emotionTired, 'icon': Icons.bedtime},
+    '开心': {'id':1,'color': AppColors.emotionHappy, 'icon': Icons.sentiment_very_satisfied},
+    '平静': {'id':2,'color': AppColors.emotionCalm, 'icon': Icons.sentiment_satisfied},
+    '焦虑': {'id':3,'color': AppColors.emotionAnxious, 'icon': Icons.sentiment_neutral},
+    '悲伤': {'id':4,'color': AppColors.emotionSad, 'icon': Icons.sentiment_dissatisfied},
+    '愤怒': {'id':5,'color': AppColors.emotionAngry, 'icon': Icons.sentiment_very_dissatisfied},
+    '疲惫': {'id':6,'color': AppColors.emotionTired, 'icon': Icons.bedtime},
   };
 
   @override

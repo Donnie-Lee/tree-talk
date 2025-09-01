@@ -115,6 +115,7 @@ class _MoodCalendarState extends State<MoodCalendar> {
               mainAxisSpacing: 4,
               crossAxisSpacing: 4,
             ),
+            padding: const EdgeInsets.only(bottom: 0),
             itemCount: daysInMonth.length + firstWeekday,
             itemBuilder: (context, index) {
               if (index < firstWeekday) {

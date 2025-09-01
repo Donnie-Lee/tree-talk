@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tree_talk/services/api_service.dart';
+import '../models/user_profile.dart';
 import '../routes/app_routes.dart';
 import '../theme/app_colors.dart';
 
@@ -10,6 +12,32 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  var apiService = ApiService();
+  UserProfile? userProfile;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    loadUserInfo();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  void loadUserInfo() {
+    apiService.profile().then((response) {
+      if (response.data != null) {
+        setState(() {
+          userProfile = response.data;
+        });
+      }
+    });
+  }
+
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -31,10 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           content: Text(
             '确定要退出登录吗？退出后需要重新登录才能使用应用。',
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 16,
-            ),
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
           ),
           actions: [
             TextButton(
@@ -43,14 +68,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
               child: Text(
                 '取消',
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 16,
-                ),
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
               ),
             ),
             TextButton(
               onPressed: () {
+                apiService.removeToken();
                 Navigator.of(context).pop(); // 关闭确认弹窗
                 // 跳转到登录页
                 Navigator.pushReplacementNamed(context, AppRoutes.login);
@@ -156,15 +179,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
             height: 80,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [AppColors.accent, AppColors.neonOrange],
-              ),
+              color: AppColors.glassBg,
               border: Border.all(color: Colors.white, width: 2),
             ),
-            child: const Center(
-              child: Icon(Icons.person, color: Colors.white, size: 40),
+            child: ClipOval(
+              child: userProfile?.avatar != null
+                  ? Image.network(
+                      userProfile!.avatar!,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [AppColors.accent, AppColors.neonOrange],
+                          ),
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.person, color: Colors.white, size: 40),
+                        ),
+                      ),
+                    )
+                  : Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [AppColors.accent, AppColors.neonOrange],
+                        ),
+                      ),
+                      child: const Center(
+                        child: Icon(Icons.person, color: Colors.white, size: 40),
+                      ),
+                    ),
             ),
           ),
           const SizedBox(width: 40),
@@ -174,7 +223,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '用户名',
+                  userProfile?.nickname ?? '用户名',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -183,7 +232,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'user@example.com',
+                  userProfile?.username ?? 'user@example.com',
                   style: TextStyle(
                     fontSize: 14,
                     color: AppColors.textSecondary,
@@ -193,14 +242,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 // 统计信息
                 Row(
                   children: [
-                    _buildUserStat('已记录', '32'),
+                    _buildUserStat(
+                      '已记录',
+                      "${userProfile?.totalCheckInDays ?? 0}",
+                    ),
                     Container(
                       height: 24,
                       width: 1,
                       color: AppColors.glassBorder,
                       margin: const EdgeInsets.symmetric(horizontal: 16),
                     ),
-                    _buildUserStat('连续打卡', '7天'),
+                    _buildUserStat(
+                      '连续打卡',
+                      '${userProfile?.continuousCheckInDays ?? 0}天',
+                    ),
                   ],
                 ),
               ],
@@ -335,10 +390,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
-            Icon(
-              Icons.chevron_right,
-              color: AppColors.textSecondary,
-            ),
+            Icon(Icons.chevron_right, color: AppColors.textSecondary),
           ],
         ),
       ),
