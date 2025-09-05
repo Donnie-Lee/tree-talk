@@ -230,14 +230,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  userProfile?.username ?? 'user@example.com',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
+
                 const SizedBox(height: 12),
                 // 统计信息
                 Row(
